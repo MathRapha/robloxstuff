@@ -62,6 +62,11 @@ local toggles = {
 		
 		elliotpizza = false;
 	};
+	
+	customRunSpeed = false;
+}
+local variables = {
+	customRunSpeed = 2;
 }
 
 local folders = {}
@@ -173,6 +178,28 @@ local Tab = Window:CreateTab("Player", 7992557358)
 
 local Section = Tab:CreateSection("Advantage")
 
+local Section = Tab:CreateSection("Run Speed")
+local Toggle = Tab:CreateToggle({
+	Name = "Custom Run Speed Multiplier Enabled",
+	CurrentValue = false,
+	Flag = "customRunSpeedToggle", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
+	Callback = function(Value)
+		toggles.customRunSpeed = Value
+		funcs.updateESP()
+	end,
+})
+local Slider = Tab:CreateSlider({
+	Name = "Custom Run Speed Multiplier",
+	Range = {1, 5},
+	Increment = 0.05,
+	Suffix = "Custom Run Speed",
+	CurrentValue = variables.customRunSpeed,
+	Flag = "customRunSpeedMultiplier", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
+	Callback = function(Value)
+		variables.customRunSpeed = Value
+	end,
+})
+
 --[[
 /\/\/\/\/\/\/\/\/\/\/\/\
 \/\/\/   VISUAL   \/\/\/
@@ -235,3 +262,16 @@ local Button = Tab:CreateButton({
 		script:Destroy()
 	end,
 })
+
+runService.RenderStepped:Connect(function ()
+	local char = plr.Character
+	if char ~= nil then
+		local speedFolder:Folder = char:FinpdFirstChild("SpeedMultipliers")
+		if speedFolder then
+			local sprinting:NumberValue = speedFolder:FindFirstChild("Sprinting")
+			if sprinting.Value > 1 then
+				sprinting.Value = variables.customRunSpeed
+			end
+		end
+	end
+end)
