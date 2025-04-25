@@ -142,6 +142,7 @@ funcs.updateESP = function ()
 	if toggles.esp.killer == true then
 		for i,v in folders.killers:GetChildren() do
 			pcall(function ()
+				if v == char then return end
 				funcs.esp.esp(v, BrickColor.new("Really red"), 0.7, "killer", Vector3.new(2,5,2))
 			end)
 		end
@@ -149,6 +150,7 @@ funcs.updateESP = function ()
 	if toggles.esp.survivor == true then
 		for i,v in folders.survivors:GetChildren() do
 			pcall(function ()
+				if v == char then return end
 				funcs.esp.esp(v, BrickColor.new("Lime green"), 0.7, "survivor", Vector3.new(2,5,2))
 			end)
 		end
