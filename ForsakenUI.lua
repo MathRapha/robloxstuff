@@ -3,10 +3,6 @@ local char = plr.Character or plr.CharacterAdded:Wait()
 local hum = char:FindFirstChildOfClass("Humanoid")
 local camera = workspace.CurrentCamera
 local mouse = plr:GetMouse()
-plr.CharacterAdded:Connect(function (newChar)
-	char = newChar
-	hum = newChar:FindFirstChildOfClass("Humanoid")
-end)
 
 local runService = game:GetService("RunService")
 local coreGui = game.CoreGui
@@ -313,5 +309,19 @@ runService.RenderStepped:Connect(function ()
 				end
 			end
 		end
+	end)
+end)
+
+plr.CharacterAdded:Connect(function (newChar)
+	char = newChar
+	hum = newChar:FindFirstChildOfClass("Humanoid")
+	local plrGui = plr.PlayerGui
+	
+	pcall(function ()
+		local mainui = plrGui:WaitForChild("MainUI")
+		local sprintbutton:ImageButton = mainui:WaitForChild("SprintingButton")
+		sprintbutton.Activated:Connect(function ()
+			sprinting = not sprinting
+		end)
 	end)
 end)
