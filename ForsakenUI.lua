@@ -304,7 +304,7 @@ runService.RenderStepped:Connect(function ()
 		
 		stamina = string.split(staminaAmount.Text, "/")[1]
 
-		if toggles.customRunSpeed == true and sprinting == true and char ~= nil and stamina > 0 then
+		if toggles.customRunSpeed == true and sprinting == true and char ~= nil then
 			local speedFolder:Folder = char:FindFirstChild("SpeedMultipliers")
 			if speedFolder then
 				local sprinting:NumberValue = speedFolder:FindFirstChild("Sprinting")
