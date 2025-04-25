@@ -2,6 +2,7 @@ local plr = game:GetService("Players").LocalPlayer
 local char = plr.Character or plr.CharacterAdded:Wait()
 local hum = char:FindFirstChildOfClass("Humanoid")
 local camera = workspace.CurrentCamera
+local mouse = plr:GetMouse()
 plr.CharacterAdded:Connect(function (newChar)
 	char = newChar
 	hum = newChar:FindFirstChildOfClass("Humanoid")
@@ -51,7 +52,7 @@ local Window = Rayfield:CreateWindow({
 local aimbotSoundNames = {
 	-- Chance --
 	"rbxassetid://139012439429121"
-	
+
 	-- c00lkidd --
 }
 
@@ -59,14 +60,14 @@ local toggles = {
 	esp = {
 		killer = false;
 		survivor = false;
-		
+
 		elliotpizza = false;
 	};
-	
-	customRunSpeed = false;
+
+	customSpeed = false;
 }
 local variables = {
-	customRunSpeed = 2;
+	customSpeed = 2;
 }
 
 local folders = {}
@@ -80,7 +81,7 @@ folders.ingamemap = folders.map:WaitForChild("Ingame")
 
 
 local funcs = {
-	
+
 	esp = {}
 
 }
@@ -141,18 +142,24 @@ funcs.updateESP = function ()
 	funcs.esp.delete("elliotpizza")
 	if toggles.esp.killer == true then
 		for i,v in folders.killers:GetChildren() do
-			funcs.esp.esp(v, BrickColor.new("Really red"), 0.7, "killer", Vector3.new(2,5,2))
+			pcall(function ()
+				funcs.esp.esp(v, BrickColor.new("Really red"), 0.7, "killer", Vector3.new(2,5,2))
+			end)
 		end
 	end
 	if toggles.esp.survivor == true then
 		for i,v in folders.survivors:GetChildren() do
-			funcs.esp.esp(v, BrickColor.new("Lime green"), 0.7, "survivor", Vector3.new(2,5,2))
+			pcall(function ()
+				funcs.esp.esp(v, BrickColor.new("Lime green"), 0.7, "survivor", Vector3.new(2,5,2))
+			end)
 		end
 	end
 	if toggles.esp.elliotpizza == true then
 		for i,v in folders.ingamemap:GetChildren() do
 			if v.Name == "Pizza" then
-				funcs.esp.esp(v, BrickColor.new("Red flip/flop"), 0.9, "elliotpizza", nil)
+				pcall(function ()
+					funcs.esp.esp(v, BrickColor.new("Red flip/flop"), 0.9, "elliotpizza", nil)
+				end)
 			end
 		end
 	end
@@ -182,21 +189,20 @@ local Section = Tab:CreateSection("Run Speed")
 local Toggle = Tab:CreateToggle({
 	Name = "Custom Run Speed Multiplier Enabled",
 	CurrentValue = false,
-	Flag = "customRunSpeedToggle", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
+	Flag = "customSpeedToggle", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
 	Callback = function(Value)
-		toggles.customRunSpeed = Value
-		funcs.updateESP()
+		toggles.customSpeed = Value
 	end,
 })
 local Slider = Tab:CreateSlider({
 	Name = "Custom Run Speed Multiplier",
 	Range = {1, 5},
 	Increment = 0.05,
-	Suffix = "Custom Run Speed",
-	CurrentValue = variables.customRunSpeed,
-	Flag = "customRunSpeedMultiplier", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
+	Suffix = "",
+	CurrentValue = variables.customSpeed,
+	Flag = "customSpeedMultiplier", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
 	Callback = function(Value)
-		variables.customRunSpeed = Value
+		variables.customSpeed = Value
 	end,
 })
 
@@ -263,14 +269,20 @@ local Button = Tab:CreateButton({
 	end,
 })
 
+
+
+local sprinting = false
+
+
+
 runService.RenderStepped:Connect(function ()
 	local char = plr.Character
-	if char ~= nil then
-		local speedFolder:Folder = char:FinpdFirstChild("SpeedMultipliers")
+	if toggles.customSpeed == true and char ~= nil then
+		local speedFolder:Folder = char:FindFirstChild("SpeedMultipliers")
 		if speedFolder then
 			local sprinting:NumberValue = speedFolder:FindFirstChild("Sprinting")
-			if sprinting.Value > 1 then
-				sprinting.Value = variables.customRunSpeed
+			if sprinting then
+				sprinting.Value = variables.customSpeed
 			end
 		end
 	end
