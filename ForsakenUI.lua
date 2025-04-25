@@ -13,6 +13,8 @@ local coreGui = game.CoreGui
 local uis = game:GetService("UserInputService")
 local starterGui = game:GetService("StarterGui")
 
+local stamina = 100
+
 local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 
 local Window = Rayfield:CreateWindow({
@@ -64,11 +66,12 @@ local toggles = {
 		elliotpizza = false;
 	};
 
-	customSpeed = false;
+	customRunSpeed = false;
 }
 local variables = {
-	customSpeed = 2;
+	customRunSpeed = 2;
 }
+local sprinting = false
 
 local folders = {}
 folders.players = workspace:WaitForChild("Players")
@@ -189,9 +192,9 @@ local Section = Tab:CreateSection("Run Speed")
 local Toggle = Tab:CreateToggle({
 	Name = "Custom Run Speed Multiplier Enabled",
 	CurrentValue = false,
-	Flag = "customSpeedToggle", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
+	Flag = "customRunSpeedToggle", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
 	Callback = function(Value)
-		toggles.customSpeed = Value
+		toggles.customRunSpeed = Value
 	end,
 })
 local Slider = Tab:CreateSlider({
@@ -199,10 +202,10 @@ local Slider = Tab:CreateSlider({
 	Range = {1, 5},
 	Increment = 0.05,
 	Suffix = "",
-	CurrentValue = variables.customSpeed,
-	Flag = "customSpeedMultiplier", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
+	CurrentValue = variables.customRunSpeed,
+	Flag = "customRunSpeedMultiplier", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
 	Callback = function(Value)
-		variables.customSpeed = Value
+		variables.customRunSpeed = Value
 	end,
 })
 
@@ -234,6 +237,7 @@ local Toggle = Tab:CreateToggle({
 		funcs.updateESP()
 	end,
 })
+--[[
 local Toggle = Tab:CreateToggle({
 	Name = "Elliot's Pizza ESP",
 	CurrentValue = false,
@@ -243,14 +247,17 @@ local Toggle = Tab:CreateToggle({
 		funcs.updateESP()
 	end,
 })
+]]
 
 folders.killers.ChildAdded:Connect(funcs.updateESP)
 folders.killers.ChildRemoved:Connect(funcs.updateESP)
 folders.survivors.ChildAdded:Connect(funcs.updateESP)
 folders.survivors.ChildRemoved:Connect(funcs.updateESP)
 
+--[[
 folders.ingamemap.ChildAdded:Connect(funcs.updateESP)
 folders.ingamemap.ChildRemoved:Connect(funcs.updateESP)
+]]
 
 --[[
 /\/\/\/\/\/\/\/\/\/\/\/\
@@ -271,19 +278,40 @@ local Button = Tab:CreateButton({
 
 
 
-local sprinting = false
-
-
+uis.InputBegan:Connect(function (input)
+	local key = input.KeyCode
+	if key == Enum.KeyCode.LeftShift then
+		sprinting = true
+	end
+end)
+uis.InputEnded:Connect(function (input)
+	local key = input.KeyCode
+	if key == Enum.KeyCode.LeftShift then
+		sprinting = false
+	end
+end)
 
 runService.RenderStepped:Connect(function ()
 	local char = plr.Character
-	if toggles.customSpeed == true and char ~= nil then
-		local speedFolder:Folder = char:FindFirstChild("SpeedMultipliers")
-		if speedFolder then
-			local sprinting:NumberValue = speedFolder:FindFirstChild("Sprinting")
-			if sprinting then
-				sprinting.Value = variables.customSpeed
+	local plrGui = plr.PlayerGui
+	
+	pcall(function ()
+		local temporaryui = plrGui.TemporaryUI
+		local playerInfo = temporaryui.PlayerInfo
+		local bars = playerInfo.Bars
+		local staminaBar = bars.Stamina
+		local staminaAmount = staminaBar.Amount
+		
+		stamina = string.split(staminaAmount.Text, "/")[1]
+
+		if toggles.customRunSpeed == true and sprinting == true and char ~= nil and stamina > 0 then
+			local speedFolder:Folder = char:FindFirstChild("SpeedMultipliers")
+			if speedFolder then
+				local sprinting:NumberValue = speedFolder:FindFirstChild("Sprinting")
+				if sprinting then
+					sprinting.Value = variables.customRunSpeed
+				end
 			end
 		end
-	end
+	end)
 end)
